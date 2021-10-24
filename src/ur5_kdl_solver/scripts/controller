@@ -1,0 +1,34 @@
+#! /usr/bin/env python
+import tf
+import rospy
+from urdf_parser_py.urdf import URDF
+from ur5_joint_publisher.joint_state_publisher import JointPublisher
+from ur5_kdl_solver.kdl_parser import KDLParser
+from ur5_kdl_solver.kdl_kinematics import KDLKinematics
+from ur5_kdl_solver.utils import calculate_new_ee_pose
+from task_msgs.msg import Force
+
+def main():
+    rospy.init_node('controller')
+    jp = JointPublisher()
+    robot  = URDF.from_parameter_server(key='robot_description')
+    kdl_parser = KDLParser()
+    tree = kdl_parser.kdl_tree_from_urdf_model(robot)
+    chain = tree.getChain("base_link","ee_link")
+    kdl_kinematics = KDLKinematics(chain)
+    listener = tf.TransformListener()
+    rospy.sleep(2)
+    while not rospy.is_shutdown():
+        force = rospy.wait_for_message('random_force',Force)
+        t = listener.getLatestCommonTime("/base_link","/ee_link")
+        current_ee_pose = listener.lookupTransform("/base_link","/ee_link",t)
+        new_pose = calculate_new_ee_pose(current_ee_pose,force)
+        joint_angles = kdl_kinematics.inverse_kinematics(new_pose[0],new_pose[1])
+        jp.publish_joint_values(joint_angles)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(1)

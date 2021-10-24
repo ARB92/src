@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find ur_gazebo)/launch/ur5.launch">
+  </include>
+  
+  <node name="ur5_controller" pkg="ur5_kdl_solver" type="controller" respawn="true" output="screen"/>
+  <node name="random_force_generator" pkg="ur5_kdl_solver" type="force_generator" respawn="true" output="screen"/>
+
+
+
+</launch>

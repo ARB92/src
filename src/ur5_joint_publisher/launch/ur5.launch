@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find ur_gazebo)/launch/ur5.launch">
+  </include>
+  
+  <node name="ur5_joint_publisher" pkg="ur5_joint_publisher" type="joint_publisher" respawn="true" output="screen"/>
+
+
+</launch>
