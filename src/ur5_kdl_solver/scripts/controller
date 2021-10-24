@@ -5,7 +5,7 @@ from urdf_parser_py.urdf import URDF
 from ur5_joint_publisher.joint_state_publisher import JointPublisher
 from ur5_kdl_solver.kdl_parser import KDLParser
 from ur5_kdl_solver.kdl_kinematics import KDLKinematics
-from ur5_kdl_solver.utils import calculate_new_ee_pose
+from ur5_kdl_solver.utils import calculate_new_ee_pose, wrap_to_pi
 from task_msgs.msg import Force
 
 def main():
@@ -24,7 +24,7 @@ def main():
         current_ee_pose = listener.lookupTransform("/base_link","/ee_link",t)
         new_pose = calculate_new_ee_pose(current_ee_pose,force)
         joint_angles = kdl_kinematics.inverse_kinematics(new_pose[0],new_pose[1])
-        jp.publish_joint_values(joint_angles)
+        jp.publish_joint_values(wrap_to_pi(joint_angles))
 
 
 if __name__ == '__main__':
